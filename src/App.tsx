@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
+import {FC, useState} from 'react';
+import { ITodo } from './interfaces/interfaces';
+import { NavBar } from './components/NavBar/NavBar';
+import { ToDoForm } from './components/ToDoForm/ToDoForm';
+import { ToDoList } from './components/TodoList/TodoList';
 import './App.css';
 
-function App() {
+const App: FC = (): JSX.Element => {
+  const [todos, setTodos] = useState<ITodo[]>([])
+
+  const addTitle = (title: string) => {
+    const newTodo: ITodo = {
+      title: title,
+      id: Date.now(),
+      completed: false,
+    }
+
+    setTodos(prev => [...prev, newTodo])
+  }
+
+  const toggleHandler = (id: number) => {
+    const newTodos = todos.map(todo => {
+      if(todo.id === id) todo.completed = !todo.completed
+      
+      return todo
+    })
+    
+    setTodos(newTodos)
+  }
+
+  const removeHandler = (id: number) => {
+    setTodos(prev => 
+      prev.filter(todo => todo.id !== id))
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <NavBar/>
+      <div className='container'>
+        <ToDoForm addTodo={addTitle} />
+        <ToDoList 
+          todos={todos}
+          onToggle={toggleHandler}
+          onRemove={removeHandler}
+        />
+      </div>
+    </>
+  )
 }
 
 export default App;
